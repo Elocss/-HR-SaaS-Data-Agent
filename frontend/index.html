@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR SaaS Data Agent - Panel de Control</title>
+    <!-- Google Fonts para tipografía moderna -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=6">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <span class="logo-icon">📊</span>
+                <div class="logo-text">
+                    <h1>HR SaaS Data Agent</h1>
+                    <p>Agente inteligente de análisis de personas y compensaciones</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Layout -->
+        <main class="app-main">
+            <!-- Left Panel: Controls & Upload -->
+            <section class="control-panel">
+                <div class="card">
+                    <h2 class="card-title">📁 1. Cargar Datos</h2>
+                    <p class="card-subtitle">Selecciona el origen e ingresa tus datos estructurados o híbridos</p>
+                    
+                    <!-- Navigation Tabs for Upload Mode -->
+                    <div class="source-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">
+                        <button class="source-tab-btn active" data-source="source-files" style="flex: 1; padding: 0.5rem; border: none; background: none; font-weight: 600; cursor: pointer; border-bottom: 2px solid #2563eb; color: #2563eb;">📁 Archivos</button>
+                        <button class="source-tab-btn" data-source="source-url" style="flex: 1; padding: 0.5rem; border: none; background: none; font-weight: 500; cursor: pointer; color: #64748b;">🔗 Enlace Web</button>
+                        <button class="source-tab-btn" data-source="source-db" style="flex: 1; padding: 0.5rem; border: none; background: none; font-weight: 500; cursor: pointer; color: #64748b;">🗄️ Base de Datos</button>
+                    </div>
+
+                    <!-- Source: Local Files -->
+                    <div class="source-content active" id="source-files">
+                        <div id="drop-zone" class="drop-zone">
+                            <span class="drop-zone-icon">📥</span>
+                            <p class="drop-zone-text">Arrastra tu archivo CSV, TXT, JSON o DB/SQLITE aquí o <span class="browse-link">busca en tu equipo</span></p>
+                            <input type="file" id="file-input" accept=".csv,.txt,.json,.db,.sqlite" style="display: none;">
+                        </div>
+                        
+                        <div id="file-status" class="file-status hidden">
+                            <span class="file-icon">📄</span>
+                            <div class="file-details">
+                                <span id="file-name" class="file-name">filename.csv</span>
+                                <span id="file-size" class="file-size">0 KB</span>
+                            </div>
+                            <button id="remove-file" class="remove-btn">✕</button>
+                        </div>
+                        <div id="text-file-status" class="file-status hidden" style="margin-top: 0.5rem; background: #ecfdf5; border-color: #a7f3d0; padding: 0.75rem; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid;">
+                            <span class="file-icon">📝</span>
+                            <div class="file-details" style="flex: 1; margin-left: 0.5rem;">
+                                <span id="text-file-name" class="file-name" style="font-weight: 600; color: #0f172a; font-size: 0.875rem;">feedback.txt</span>
+                                <span id="text-file-size" class="file-size" style="font-size: 0.75rem; color: #64748b; display: block;">0 KB</span>
+                            </div>
+                            <button id="remove-text-file" class="remove-btn" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1rem;">✕</button>
+                        </div>
+                    </div>
+
+                    <!-- Source: Web URL Scraper -->
+                    <div class="source-content hidden" id="source-url">
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label for="web-url" style="display: block; font-weight: 500; font-size: 0.875rem; color: #334155; margin-bottom: 0.375rem;">URL de Página Web con Tablas</label>
+                            <div class="input-with-button" style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="web-url" placeholder="https://ejemplo.com/datos-laborales" style="flex: 1; padding: 0.625rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.875rem;">
+                                <button id="btn-scrape-url" class="btn btn-primary" style="padding: 0.625rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; background: #2563eb; color: #fff;">Extraer</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Source: Remote Database Connections -->
+                    <div class="source-content hidden" id="source-db">
+                        <div class="form-group" style="margin-bottom: 0.75rem;">
+                            <label for="db-type" style="display: block; font-weight: 500; font-size: 0.875rem; color: #334155; margin-bottom: 0.375rem;">Tipo de Base de Datos</label>
+                            <select id="db-type" style="width: 100%; padding: 0.625rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.875rem; background: white;">
+                                <option value="sql">SQL (SQLite / PostgreSQL / MySQL)</option>
+                                <option value="nosql">NoSQL (MongoDB)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0.75rem;">
+                            <label for="db-uri" style="display: block; font-weight: 500; font-size: 0.875rem; color: #334155; margin-bottom: 0.375rem;">Cadena de Conexión (URI / URL)</label>
+                            <input type="text" id="db-uri" placeholder="postgresql://usuario:pass@localhost:5432/db" style="width: 100%; padding: 0.625rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.875rem; box-sizing: border-box;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label id="lbl-db-query" for="db-query" style="display: block; font-weight: 500; font-size: 0.875rem; color: #334155; margin-bottom: 0.375rem;">Consulta SQL / Tabla</label>
+                            <input type="text" id="db-query" placeholder="SELECT * FROM data" value="SELECT * FROM data" style="width: 100%; padding: 0.625rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.875rem; box-sizing: border-box;">
+                        </div>
+                        <button id="btn-connect-db" class="btn btn-primary btn-full" style="width: 100%; padding: 0.625rem; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; background: #2563eb; color: #fff;">Conectar y Cargar</button>
+                    </div>
+
+                </div>
+
+                <div class="card actions-card disabled" id="actions-card">
+                    <h2 class="card-title">⚡ 2. Ejecutar Análisis</h2>
+                    <p class="card-subtitle">Selecciona el tipo de procesamiento que requieres</p>
+                    
+                    <div class="action-buttons" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <button id="btn-eda" class="btn btn-primary btn-eda" style="display: flex; align-items: center; text-align: left; gap: 1rem; width: 100%;">
+                            <span class="btn-icon" style="font-size: 1.5rem;">🔍</span>
+                            <div class="btn-text" style="display: flex; flex-direction: column;">
+                                <strong>Análisis EDA Simple</strong>
+                                <span style="font-size: 0.75rem; opacity: 0.9;">Estadísticas descriptivas y distribuciones</span>
+                            </div>
+                        </button>
+                        
+                        <button id="btn-financial" class="btn btn-secondary btn-financial" style="display: flex; align-items: center; text-align: left; gap: 1rem; width: 100%;">
+                            <span class="btn-icon" style="font-size: 1.5rem;">💰</span>
+                            <div class="btn-text" style="display: flex; flex-direction: column;">
+                                <strong>Análisis Financiero Avanzado</strong>
+                                <span style="font-size: 0.75rem; opacity: 0.9;">ROI de capacitación, costos y Gini</span>
+                            </div>
+                        </button>
+
+                        <button id="btn-hybrid" class="btn btn-hybrid" style="display: flex; align-items: center; text-align: left; gap: 1rem; width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: none; background: #a855f7; color: white; cursor: pointer; font-weight: 500; transition: all 0.2s;">
+                            <span class="btn-icon" style="font-size: 1.5rem;">🧠</span>
+                            <div class="btn-text" style="display: flex; flex-direction: column;">
+                                <strong>Análisis Híbrido Avanzado</strong>
+                                <span style="font-size: 0.75rem; opacity: 0.9;">Métricas de nómina y feedback cualitativo</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card slack-card disabled" id="slack-card">
+                    <h2 class="card-title">📢 3. Compartir Reporte</h2>
+                    <p class="card-subtitle">Envía el reporte generado al canal de Slack o por Gmail</p>
+                    
+                    <div class="form-group">
+                        <label for="slack-webhook">Webhook URL de Slack</label>
+                        <input type="text" id="slack-webhook" placeholder="https://hooks.slack.com/services/..." value="">
+                    </div>
+                    
+                    <button id="btn-send-slack" class="btn btn-slack btn-full">
+                        <span class="btn-icon">💬</span> Compartir en Slack
+                    </button>
+
+                    <button id="btn-send-gmail" class="btn btn-gmail btn-full" style="margin-top: 0.75rem;">
+                        <span class="btn-icon">📧</span> Compartir por Gmail
+                    </button>
+                </div>
+            </section>
+
+            <!-- Right Panel: Results & Viewer -->
+            <section class="results-panel">
+                <div class="card results-card" id="results-card">
+                    <!-- Loading overlay -->
+                    <div id="loading" class="loading-overlay hidden">
+                        <div class="spinner"></div>
+                        <p id="loading-text">Ejecutando análisis...</p>
+                    </div>
+
+                    <!-- Welcome placeholder -->
+                    <div id="results-welcome" class="results-welcome">
+                        <span class="welcome-icon">🧠</span>
+                        <h3>Buzón del Agente de Datos</h3>
+                        <p>Sube una base de datos CSV y selecciona un análisis para ver los reportes e insights generados.</p>
+                    </div>
+
+                    <!-- Main Results Display (Tabs) -->
+                    <div id="results-content" class="results-content hidden">
+                        <div class="results-header">
+                            <div class="analysis-tag" id="analysis-type-tag">EDA</div>
+                            <div class="tabs">
+                                <button class="tab-btn active" data-tab="tab-report">📝 Informe Ejecutivo</button>
+                                <button class="tab-btn" data-tab="tab-charts">📈 Gráficos del Negocio</button>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Written Report -->
+                        <div class="tab-content active" id="tab-report">
+                            <div class="markdown-body" id="report-text">
+                                <!-- Report Markdown goes here -->
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Charts -->
+                        <div class="tab-content" id="tab-charts">
+                            <div class="charts-grid" id="charts-container">
+                                <!-- Generated charts go here -->
+                            </div>
+
+                            <!-- Vista Previa de Datos inside Charts Tab -->
+                            <div id="data-preview-container" class="hidden" style="margin-top: 1.5rem; border-top: 2px solid #e2e8f0; padding-top: 1.25rem;">
+                                <h4 style="font-size: 0.95rem; font-weight: 600; color: #1e293b; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.375rem;">🗂️ Vista Previa del Conjunto de Datos (Primeras 5 filas)</h4>
+                                <div style="overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; max-height: 350px;">
+                                    <table id="preview-table" style="width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left; background: white;">
+                                        <!-- Table header and rows go here -->
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="app.js?v=6"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+# Virtual environments
+.venv/
+.env/
+env/
+venv/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Temporary uploads and cache directories
+uploads/*
+!uploads/.gitkeep
+scratch/
+.system_generated/
+.gemini/
+
+# Dynamically generated visualization assets and folders
+frontend/visualizaciones/*.png
+visualizaciones/
+
+# System files
+desktop.ini
+
+# IDE settings
+.vscode/
+.idea/
